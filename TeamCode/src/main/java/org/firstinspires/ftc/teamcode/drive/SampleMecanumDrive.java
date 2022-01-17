@@ -19,16 +19,23 @@ import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAcceleration
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner;
+import org.firstinspires.ftc.teamcode.util.AxesSigns;
+import org.firstinspires.ftc.teamcode.util.BNO055IMUUtil;
 import org.firstinspires.ftc.teamcode.util.LynxModuleUtil;
 
 import java.util.ArrayList;
@@ -68,10 +75,23 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     private TrajectoryFollower follower;
 
-    private DcMotorEx leftFront, leftRear, rightRear, rightFront;
+    public DcMotorEx leftFront, leftRear, rightRear, rightFront;
     private List<DcMotorEx> motors;
 
-    private BNO055IMU imu;
+    public DcMotor backCarousel, frontCarousel, arm;
+    public CRServo intake;
+    public Servo drop;
+
+
+    public BNO055IMU imu;
+    public Orientation angles;
+    public double absHeading = 0.0;
+    public double originalHeading = 0.0;
+
+    public double slidePosScale = 64, slidePowScale = 0.0025;
+    public double slidePosCurrent=0, slidePosDes=0, slidePosError=0, slidePow=0;
+    public double integrater = 0.001, intpower = 0.00075, multiplier = 1, speedK = 1;
+
     private VoltageSensor batteryVoltageSensor;
 
     public SampleMecanumDrive(HardwareMap hardwareMap) {
@@ -96,12 +116,17 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         // TODO: if your hub is mounted vertically, remap the IMU axes so that the z-axis points
         // upward (normal to the floor) using a command like the following:
-        // BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
+        BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
-        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        leftFront = hardwareMap.get(DcMotorEx.class, "lf");
+        leftRear = hardwareMap.get(DcMotorEx.class, "lr");
+        rightRear = hardwareMap.get(DcMotorEx.class, "rr");
+        rightFront = hardwareMap.get(DcMotorEx.class, "rf");
+        backCarousel = hardwareMap.get(DcMotor.class, "backCarousel");
+        frontCarousel = hardwareMap.get(DcMotor.class, "frontCarousel");
+        arm = hardwareMap.get(DcMotor.class, "arm");
+        intake = hardwareMap.get(CRServo.class, "intake");
+        drop = hardwareMap.get(Servo.class, "drop");
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
@@ -122,6 +147,8 @@ public class SampleMecanumDrive extends MecanumDrive {
         }
 
         // TODO: reverse any motors using DcMotor.setDirection()
+        rightRear.setDirection(DcMotor.Direction.REVERSE);                                  //alternating between forward and reverse depending on motor placement
+        leftRear.setDirection(DcMotor.Direction.REVERSE);
 
         // TODO: if desired, use setLocalizer() to change the localization method
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
