@@ -20,9 +20,9 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 // Name the program as it shows up in the robotr Station
 @Disabled
-@Autonomous(name = "Blue Warehouse")
+@Autonomous(name = "Blue Warehouse3")
 
-public class RedWarehouse extends LinearOpMode {
+public class RedWarehouse1 extends LinearOpMode {
 
     SampleMecanumDrive vector;
     /* Note: This sample uses the all-objects Tensor Flow model (FreightFrenzy_BCDM.tflite), which contains

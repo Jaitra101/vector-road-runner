@@ -128,7 +128,7 @@ public class TeleOpBallDrive extends OpMode
             rightRear.setPower(0);
         }
 
-        slider.setPower(gamepad2.right_stick_y);
+        slider.setPower(-gamepad2.right_stick_y);
 /*
         //Right and left triggers run the intake servo
         if (gamepad2.right_bumper == true) {

@@ -78,9 +78,9 @@ public class SampleMecanumDrive extends MecanumDrive {
     public DcMotorEx leftFront, leftRear, rightRear, rightFront;
     private List<DcMotorEx> motors;
 
-    public DcMotor backCarousel, frontCarousel, arm;
+    public DcMotor arm;
     public CRServo intake;
-    public Servo drop;
+    public Servo slider;
 
 
     public BNO055IMU imu;
@@ -122,11 +122,11 @@ public class SampleMecanumDrive extends MecanumDrive {
         leftRear = hardwareMap.get(DcMotorEx.class, "lr");
         rightRear = hardwareMap.get(DcMotorEx.class, "rr");
         rightFront = hardwareMap.get(DcMotorEx.class, "rf");
-        backCarousel = hardwareMap.get(DcMotor.class, "backCarousel");
-        frontCarousel = hardwareMap.get(DcMotor.class, "frontCarousel");
-        arm = hardwareMap.get(DcMotor.class, "arm");
-        intake = hardwareMap.get(CRServo.class, "intake");
-        drop = hardwareMap.get(Servo.class, "drop");
+       // backCarousel = hardwareMap.get(DcMotor.class, "backCarousel");
+        //frontCarousel = hardwareMap.get(DcMotor.class, "frontCarousel");
+       // arm = hardwareMap.get(DcMotor.class, "arm");
+        //intake = hardwareMap.get(CRServo.class, "intake");
+        //slider = hardwareMap.get(Servo.class, "slider");
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 

@@ -20,10 +20,9 @@ import java.util.List;
 
 
 // Name the program as it shows up in the robotr Station
-@Disabled
 @Autonomous(name = "Blue Warehouse")
 
-public class BlueWarehouse extends LinearOpMode {
+public class BlueWarehouse1 extends LinearOpMode {
 
     SampleMecanumDrive vector;
     /* Note: This sample uses the all-objects Tensor Flow model (FreightFrenzy_BCDM.tflite), which contains
@@ -147,16 +146,16 @@ public class BlueWarehouse extends LinearOpMode {
 
             if (objectDetected > objectAbsent) {
                 // The object is located on the right-most spot
-                telemetry.addData("Position: ", "Right");
+                telemetry.addData("Position: ", "Middle");
                 telemetry.update();
                 tfod.shutdown();
                 sleep(500);
-                objectRight();
+                objectMiddle();
             }
             else  {
                 // The object is not on the right-most spot, so we move left to the middle spot
                 Trajectory strafeMiddle = vector.trajectoryBuilder(new Pose2d(0, 0, 0))
-                        .lineToLinearHeading(new Pose2d(12, 12, Math.toRadians(0)))
+                        .lineToLinearHeading(new Pose2d(6, 6, Math.toRadians(0)))
                         .build();
                 vector.followTrajectory(strafeMiddle);
                 sleep(1000);
@@ -193,11 +192,11 @@ public class BlueWarehouse extends LinearOpMode {
 
                 if (objectDetected > objectAbsent) {
                     // The object is detected on the middle spot
-                    telemetry.addData("Position: ", "Middle");
+                    telemetry.addData("Position: ", "Right");
                     telemetry.update();
                     tfod.shutdown();
                     sleep(500);
-                    objectMiddle();
+                    objectRight();
                 }
                 else {
                     // The object was not detected in the middle, so it must be on the left spot
@@ -221,14 +220,15 @@ public class BlueWarehouse extends LinearOpMode {
         telemetry.update();
         for(int f = 1; f < 20; f++)
         {
-            vector.leftFront.setPower(-0.05 * (vector.absHeading - vector.originalHeading));
-            vector.leftRear.setPower(-0.05 * (vector.absHeading - vector.originalHeading));
-            vector.rightFront.setPower(0.05 * (vector.absHeading - vector.originalHeading));
-            vector.rightRear.setPower(0.05 * (vector.absHeading - vector.originalHeading));
+            vector.leftFront.setPower(-0.10 * (vector.absHeading - vector.originalHeading));
+          //  vector.leftRear.setPower(-0.05 * (vector.absHeading - vector.originalHeading));
+           // vector.rightFront.setPower(0.05 * (vector.absHeading - vector.originalHeading));
+            vector.rightRear.setPower(0.10 * (vector.absHeading - vector.originalHeading));
             vector.angles = vector.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
             vector.absHeading = vector.angles.firstAngle;
             telemetry.addData("Heading", vector.absHeading);
             telemetry.update();
+           //sleep();
         }
         vector.leftFront.setPower(0);
         vector.leftRear.setPower(0);
@@ -240,17 +240,31 @@ public class BlueWarehouse extends LinearOpMode {
 
     public void objectRight()
     {
+        Trajectory strafeTest = vector.trajectoryBuilder(new Pose2d(0, 0, 0))
+                .lineToLinearHeading(new Pose2d(12, 12, Math.toRadians(0)))
+                .build();
+        vector.followTrajectory(strafeTest);
 
-
+        gyroCorrect();
     }
     public void objectMiddle()
     {
+        Trajectory strafeTest = vector.trajectoryBuilder(new Pose2d(0, 0, 0))
+                .lineToLinearHeading(new Pose2d(12, 12, Math.toRadians(90)))
+                .build();
+        vector.followTrajectory(strafeTest);
 
+        gyroCorrect();
 
     }
     public void objectLeft()
     {
+        Trajectory strafeTest = vector.trajectoryBuilder(new Pose2d(0, 0, 0))
+                .lineToLinearHeading(new Pose2d(0, 20, Math.toRadians(90)))
+                .build();
+        vector.followTrajectory(strafeTest);
 
+        gyroCorrect();
 
     }
 
